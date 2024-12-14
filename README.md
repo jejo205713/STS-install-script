@@ -17,5 +17,25 @@ You can download the `sts-linux-install.sh` script directly from the repository,
 ```bash
 wget https://example.com/path/to/sts-linux-install.sh
 ```
+###2. Change to the Repository Directory
+
+After cloning the repository, navigate into the directory where it was cloned:
+
+cd yourrepository
+
+###3. Make the Script Executable
+
+Ensure that the script is executable by running the following command to give it execute permissions:
+```bash
+chmod +x sts-linux-install.sh
+```
+###4. Run the Script
+
+Once the script is executable, run it to automatically generate the .desktop entry for Spring Tool Suite:
+```bash
+./sts-linux-install.sh
+```
+This will create a desktop entry for Spring Tool Suite, allowing you to launch it directly from your application menu.
+
 ## CREDITS: JEJO.J
 ### WITH LOVE FOR BUBUCHI ! 
