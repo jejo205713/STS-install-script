@@ -15,14 +15,14 @@ This script automates the installation of Spring Tool Suite (STS) on Linux, incl
 You can download the `sts-linux-install.sh` script directly from the repository, or you can copy it from here:
 
 ```bash
-wget https://example.com/path/to/sts-linux-install.sh
+git clone https://github.com/jejo205713/STS-install-script.git
 ```
 ### 2. Change to the Repository Directory
 
 After cloning the repository, navigate into the directory where it was cloned:
-
-cd yourrepository
-
+```bash
+cd STS-install-script.git
+```
 ### 3. Make the Script Executable
 
 Ensure that the script is executable by running the following command to give it execute permissions:
