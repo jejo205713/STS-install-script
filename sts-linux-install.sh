@@ -29,9 +29,16 @@ PACKAGE_NAME=$(basename "$STS_PACKAGE_PATH")
 echo "Unzipping the package: $PACKAGE_NAME"
 sudo tar -xvf "$PACKAGE_NAME"
 
-# Get the folder name (assuming the package name follows the pattern "sts-<version>.RELEASE")
-STS_DIR=$(basename "$PACKAGE_NAME" .tar.gz)
-cd "$STS_DIR"
+# Dynamically detect the extracted folder name (assuming one folder is created)
+EXTRACTED_DIR=$(tar -tf "$PACKAGE_NAME" | head -n 1 | cut -d/ -f1)
+
+# Ensure the directory exists
+if [ ! -d "$EXTRACTED_DIR" ]; then
+  echo "Error: Extracted directory not found: $EXTRACTED_DIR"
+  exit 1
+fi
+
+cd "$EXTRACTED_DIR"
 
 # Step 4: Create the .desktop entry for STS
 DESKTOP_ENTRY_PATH="/usr/share/applications/STS.desktop"
@@ -42,8 +49,8 @@ sudo bash -c "cat <<EOF > $DESKTOP_ENTRY_PATH
 [Desktop Entry]
 Name=SpringSource Tool Suite
 Comment=Spring Tool Suite
-Exec=/opt/$STS_DIR/SpringToolSuite4
-Icon=/opt/$STS_DIR/icon.xpm
+Exec=/opt/$EXTRACTED_DIR/SpringToolSuite4
+Icon=/opt/$EXTRACTED_DIR/icon.xpm
 StartupNotify=true
 Terminal=false
 Type=Application
@@ -56,5 +63,5 @@ echo "You can now launch Spring Tool Suite from your application menu."
 
 # Optional: Provide a verification step
 echo "Verifying the installation..."
-cd /opt/$STS_DIR
+cd /opt/$EXTRACTED_DIR
 ls
