@@ -39,7 +39,7 @@ chmod +x "$DESKTOP_ENTRY_PATH"
 # Provide feedback
 echo "Desktop entry created at $DESKTOP_ENTRY_PATH"
 echo "You can now search for 'SpringSource Tool Suite $VERSION' in your application menu."
-echo "ORIGINALLY MADE FOR MY BUBUCHI ! "
+echo "Originallt made for my bubuchi ! "
 
-#CREDITS:
+CREDITS:
 JEJO.J
