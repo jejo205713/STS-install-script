@@ -1,45 +1,58 @@
 #!/bin/bash
 
-# Check if the STS directory exists
-STS_DIR="/opt"
-STS_BINARY_PATTERN="sts-*.RELEASE/SpringToolSuite4"
-STS_ICON_PATTERN="sts-*.RELEASE/icon.xpm"
+# Exit if any command fails
+set -e
 
-# Find the latest version of STS
-LATEST_STS_DIR=$(ls -d ${STS_DIR}/${STS_BINARY_PATTERN} | sort -V | tail -n 1)
-LATEST_ICON_PATH=$(ls ${LATEST_STS_DIR}/icon.xpm 2>/dev/null)
+# Step 1: Prompt user for the STS version or use the latest downloaded version
+echo "Enter the path to the STS tar.gz package (or press Enter to use the most recent .tar.gz file in the current directory):"
+read STS_PACKAGE_PATH
 
-if [[ ! -d "$LATEST_STS_DIR" || -z "$LATEST_ICON_PATH" ]]; then
-  echo "SpringSource Tool Suite is not installed or the icon file is missing."
+if [ -z "$STS_PACKAGE_PATH" ]; then
+  # If no path was provided, find the most recent .tar.gz file in the current directory
+  STS_PACKAGE_PATH=$(ls -t *.tar.gz | head -n 1)
+fi
+
+# Ensure the file exists
+if [ ! -f "$STS_PACKAGE_PATH" ]; then
+  echo "Error: STS package not found: $STS_PACKAGE_PATH"
   exit 1
 fi
 
-# Extract version info (assuming the directory name follows sts-*.RELEASE format)
-VERSION=$(basename "$LATEST_STS_DIR" | sed -E 's/^sts-([0-9]+\.[0-9]+\.[0-9]+)\.RELEASE$/\1/')
+# Step 2: Move the file to the /opt directory
+echo "Copying $STS_PACKAGE_PATH to /opt directory..."
+sudo mv "$STS_PACKAGE_PATH" /opt/
 
-# Desktop Entry File
-DESKTOP_ENTRY_PATH="$HOME/.local/share/applications/spring-tool-suite-${VERSION}.desktop"
+# Step 3: Extract the package in /opt
+cd /opt
+echo "Unzipping the package..."
+sudo tar -xvf "$STS_PACKAGE_PATH"
 
-# Create the desktop entry content
-cat <<EOF > "$DESKTOP_ENTRY_PATH"
+# Get the folder name (assuming the package name follows the pattern "sts-<version>.RELEASE")
+STS_DIR=$(basename "$STS_PACKAGE_PATH" .tar.gz)
+cd "$STS_DIR"
+
+# Step 4: Create the .desktop entry for STS
+DESKTOP_ENTRY_PATH="/usr/share/applications/STS.desktop"
+
+echo "Creating desktop entry at $DESKTOP_ENTRY_PATH..."
+
+sudo bash -c "cat <<EOF > $DESKTOP_ENTRY_PATH
 [Desktop Entry]
-Name=SpringSource Tool Suite $VERSION
-Comment=Spring Tool Suite - Version $VERSION
-Exec=$LATEST_STS_DIR/SpringToolSuite4
-Icon=$LATEST_ICON_PATH
+Name=SpringSource Tool Suite
+Comment=Spring Tool Suite
+Exec=/opt/$STS_DIR/SpringToolSuite4
+Icon=/opt/$STS_DIR/icon.xpm
 StartupNotify=true
 Terminal=false
 Type=Application
 Categories=Development;IDE;Java;
-EOF
+EOF"
 
-# Set correct permissions for the desktop entry file
-chmod +x "$DESKTOP_ENTRY_PATH"
+# Step 5: Provide user feedback
+echo "Desktop entry created successfully!"
+echo "You can now launch Spring Tool Suite from your application menu."
 
-# Provide feedback
-echo "Desktop entry created at $DESKTOP_ENTRY_PATH"
-echo "You can now search for 'SpringSource Tool Suite $VERSION' in your application menu."
-echo "Originallt made for my bubuchi ! "
-
-CREDITS:
-JEJO.J
+# Optional: Provide a verification step
+echo "Verifying the installation..."
+cd /opt/$STS_DIR
+ls
