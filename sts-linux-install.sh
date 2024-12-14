@@ -24,11 +24,13 @@ sudo mv "$STS_PACKAGE_PATH" /opt/
 
 # Step 3: Extract the package in /opt
 cd /opt
-echo "Unzipping the package..."
-sudo tar -xvf "$STS_PACKAGE_PATH"
+# Extract the base name of the tar.gz file (without path)
+PACKAGE_NAME=$(basename "$STS_PACKAGE_PATH")
+echo "Unzipping the package: $PACKAGE_NAME"
+sudo tar -xvf "$PACKAGE_NAME"
 
 # Get the folder name (assuming the package name follows the pattern "sts-<version>.RELEASE")
-STS_DIR=$(basename "$STS_PACKAGE_PATH" .tar.gz)
+STS_DIR=$(basename "$PACKAGE_NAME" .tar.gz)
 cd "$STS_DIR"
 
 # Step 4: Create the .desktop entry for STS
