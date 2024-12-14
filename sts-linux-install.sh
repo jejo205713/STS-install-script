@@ -24,21 +24,13 @@ sudo mv "$STS_PACKAGE_PATH" /opt/
 
 # Step 3: Extract the package in /opt
 cd /opt
-# Extract the base name of the tar.gz file (without path)
 PACKAGE_NAME=$(basename "$STS_PACKAGE_PATH")
 echo "Unzipping the package: $PACKAGE_NAME"
 sudo tar -xvf "$PACKAGE_NAME"
 
-# Dynamically detect the extracted folder name (assuming one folder is created)
-EXTRACTED_DIR=$(tar -tf "$PACKAGE_NAME" | head -n 1 | cut -d/ -f1)
-
-# Ensure the directory exists
-if [ ! -d "$EXTRACTED_DIR" ]; then
-  echo "Error: Extracted directory not found: $EXTRACTED_DIR"
-  exit 1
-fi
-
-cd "$EXTRACTED_DIR"
+# Extract the folder name dynamically
+STS_DIR=$(tar -tf "$PACKAGE_NAME" | head -n 1 | cut -d'/' -f1)
+cd "$STS_DIR"
 
 # Step 4: Create the .desktop entry for STS
 DESKTOP_ENTRY_PATH="/usr/share/applications/STS.desktop"
@@ -49,19 +41,29 @@ sudo bash -c "cat <<EOF > $DESKTOP_ENTRY_PATH
 [Desktop Entry]
 Name=SpringSource Tool Suite
 Comment=Spring Tool Suite
-Exec=/opt/$EXTRACTED_DIR/SpringToolSuite4
-Icon=/opt/$EXTRACTED_DIR/icon.xpm
+Exec=/opt/$STS_DIR/SpringToolSuite4
+Icon=/opt/$STS_DIR/icon.xpm
 StartupNotify=true
 Terminal=false
 Type=Application
 Categories=Development;IDE;Java;
 EOF"
 
-# Step 5: Provide user feedback
-echo "Desktop entry created successfully!"
-echo "You can now launch Spring Tool Suite from your application menu."
+# Step 5: Refresh the desktop database
+echo "Refreshing desktop database..."
+sudo update-desktop-database
 
-# Optional: Provide a verification step
-echo "Verifying the installation..."
-cd /opt/$EXTRACTED_DIR
-ls
+# Step 6: Test the .desktop file
+echo "Testing the .desktop file launch..."
+if gtk-launch STS; then
+  echo "Spring Tool Suite launched successfully!"
+else
+  echo "Failed to launch Spring Tool Suite. Please check the .desktop file."
+fi
+
+# Step 7: Provide feedback
+echo "Installation and configuration complete!"
+echo "You can now launch Spring Tool Suite from your application menu."
+echo "originally made for ma bubuchi !"
+
+#credits:JEJO.J
